@@ -9,7 +9,9 @@ float bulletDirectionVector[];
 ArrayList<Enemy> enemyList;
 
 int enemySpawn[][] = {{30, 30}, {500, 30}, {30, 500}, {500, 500}};
-;
+
+Wall w;
+
 
 //-------------controls-------
 final int W = 87;
@@ -34,6 +36,9 @@ void setup()
 
     enemyList.add(new Enemy(enemySpawn[randomSpawnLoc][0], enemySpawn[randomSpawnLoc][1]));
   }
+  
+  //--------------walls-----------
+  w = new Wall(200, 100, 100, 100);
 }
 
 void draw()
@@ -53,20 +58,32 @@ void draw()
 
 
   //----------bullets 2 for loops are needed 1 for moving and displaying another 1 for handling logic for deleting-------------
+  
+  //updateBulletBounce();
+  
   //---bullets move and display---------
   for (int i = 0; i < bullets.size(); i++) {
-    bullets.get(i).display();
+    
+    if(wallCollide(w, bullets.get(i), bullets.get(i).size/2))
+    {
+      PVector np = nearestPoint(w, bullets.get(i));
+      reflect(np, bullets.get(i));
+      //break;
+    }
     bullets.get(i).move();
+    bullets.get(i).display();
+    
     //int enemyCenterX = enemy.x + enemy.size/2;
     //int enemyCenterY = enemy.y + enemy.size/2;
 
     //println(distFromEnemy);
-
-
+    
     if (bullets.get(i).x > width || bullets.get(i).x < 0 || bullets.get(i).y > height || bullets.get(i).y < 0)
     {
       bullets.remove(bullets.get(i));
     }
+    
+    
   }
   //----------------updating bullets hitting the enemy----------
   for (int i = bullets.size() -1; i >= 0; i--)
@@ -94,6 +111,14 @@ void draw()
       }
     }
   }
+  
+  
+  
+  
+  //----------------------walls----------
+  w.display();
+  
+  
 
   updateEnemy();
   if (enemyList.size() <= 0)
@@ -117,8 +142,73 @@ boolean colliding(Enemy enemy, Bullet b)
   return false;
 }
 
+//-------------------wall collision for bullet----------------
+boolean wallCollide(Wall w, Bullet b, int size)
+{
+  if((b.x - size) <= (w.x + w.w) && (b.x + size >= w.x))
+  {
+    if((b.y + b.size) >= w.y && (b.y - b.size) <= (w.y + w.h))
+    {
+      return true;
+    }
+  }
+  return false;
+}
+//--------------reflecting bullet-------------------
+void reflect(PVector nearestPoint, Bullet b)
+{
+  float normalX = b.x - nearestPoint.x;
+  float normalY = b.y - nearestPoint.y;
+  println(nearestPoint.x);
+  line(b.x, b.y, nearestPoint.x, nearestPoint.y);
+  float normalize = (float)Math.sqrt((nearestPoint.x - b.x) * (nearestPoint.x - b.x) + (nearestPoint.y  - b.y) * (nearestPoint.y  - b.y));
+  normalX *= 1/normalize;
+  normalY *= 1/normalize;
+  
+  float dotProduct = (normalX * b.directionX) + (normalY * b.directionY);
+  b.directionX -= 2 * dotProduct * normalX;
+  b.directionY -= 2 * dotProduct * normalY;
+  
+}
 
+//--------------finding nearest point using box collision--------------------
+PVector nearestPoint(Wall w, Bullet b)
+{
+  
+  if(b.x >= (w.x + w.w))
+  {
+    return new PVector(w.x + w.w, b.y);
+  }
+  else if(b.x  <= w.x)
+  {
+    return new PVector(w.x, b.y);
+  }
+  
+  else if((b.y + b.size/2) <= w.y)
+  {
+    println("Top");
+    return new PVector(b.x, w.y);
+  }
+  
+  else
+  {
+    println("Bottom");
+    return new PVector(b.x, w.y + w.h);
+  }
+}
 
+void updateBulletBounce()
+{
+  for (Bullet b : bullets)
+  {
+    if(wallCollide(w, b, b.size/2))
+    {
+      PVector np = nearestPoint(w, b);
+      reflect(np, b);
+      break;
+    }
+  }
+}
 
 void updateEnemy()
 {
@@ -181,6 +271,7 @@ void calculateAngle()
   //translate(100, 100);
   rotate(angleInRadians );
   rect(0 - player.size/2, 0 - player.size/2 , player.size, player.size);
+  
   
   popMatrix();
   //println("angle in degrees " + angleInDegrees);
