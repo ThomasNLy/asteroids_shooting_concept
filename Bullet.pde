@@ -1,15 +1,19 @@
-class Bullet {
-  float x;
-  float y;
-  int speed = 10;
+class Bullet extends GameObject{
+  //float x;
+  //float y;
+  
   float directionX;
   float directionY;
-  int size = 20;
-  Bullet(float x, float y, float directionX, float directionY) {
+  
+  Bullet(int x, int y, float directionX, float directionY) {
+    
     this.x = x;
     this.y = y;
     this.directionX = directionX; 
     this.directionY = directionY;
+    this.xSpeed  = 10;
+    this.ySpeed = 10;
+    this.size = 20;
   }
 
   void display()
@@ -21,7 +25,7 @@ class Bullet {
 
   void move()
   {
-    this.x += directionX * speed;
-    this.y += directionY * speed;
+    this.x += directionX * xSpeed;
+    this.y += directionY * ySpeed;
   }
 }

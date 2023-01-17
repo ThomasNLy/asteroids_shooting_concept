@@ -113,10 +113,12 @@ void updateBullets()
 
           Enemy spawn = new Enemy(enemyList.get(j).x, enemyList.get(j).y);
           spawn.state = 1;
-          spawn.size = 20;
+          spawn.wd = 20;
+          spawn.ht = 20;
           Enemy spawn2 = new Enemy(enemyList.get(j).x, enemyList.get(j).y);
           spawn2.state = 1;
-          spawn2.size = 20;
+          spawn2.wd = 20;
+          spawn2.ht = 20;
           enemyList.add(spawn);
           enemyList.add(spawn2);
         }
@@ -128,10 +130,10 @@ void updateBullets()
   }
 }
 
-boolean colliding(Enemy enemy, Bullet b)
+boolean colliding(GameObject enemy, GameObject b)
 {
-  int enemyCenterX = enemy.x + enemy.size/2;
-  int enemyCenterY = enemy.y  + enemy.size/2;
+  int enemyCenterX = enemy.getCenter()[0];
+  int enemyCenterY = enemy.getCenter()[1];
   int distFromEnemy = (int)Math.sqrt((b.x - enemyCenterX)  * (b.x - enemyCenterX) + (b.y - enemyCenterY) * (b.y - enemyCenterY));
   if (distFromEnemy < (b.size/2 + enemy.size/2))
   {

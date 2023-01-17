@@ -1,15 +1,12 @@
-class Player {
-  int x;
-  int y;
-  int size;
- 
-  int xSpeed;
-  int ySpeed;
+class Player extends GameObject{
+  
   Player(int x, int y)
   {
     this.x = x;
     this.y = y;
-    size = 50;
+    this.size = 50;
+    this.wd = 50;
+    this.ht = 50;
   }
 
   void display()
@@ -36,12 +33,6 @@ class Player {
   {
     x += xSpeed;
     y += ySpeed;
-  }
-
-  int[] getCenter()
-  {
-    int[] arr = {this.x + size/2, this.y + size/2};
-    return (arr);
   }
 
 
