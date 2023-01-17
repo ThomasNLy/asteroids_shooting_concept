@@ -12,6 +12,7 @@ int enemySpawn[][] = {{30, 30}, {500, 30}, {30, 500}, {500, 500}};
 
 Wall w;
 
+boolean shooting;
 
 //-------------controls-------
 final int W = 87;
@@ -39,6 +40,8 @@ void setup()
 
   //--------------walls-----------
   w = new Wall(200, 100, 100, 100);
+  
+  shooting = false;
 }
 
 void draw()
@@ -55,9 +58,25 @@ void draw()
   line(playerCenterX, playerCenterY, mouseX, mouseY);
   circle(mouseX, mouseY, 10);
 
+  fireBullet();
+  updateBullets();
+ 
+  //----------------------walls----------
+  w.display();
 
 
-  //----------bullets 2 for loops are needed 1 for moving and displaying another 1 for handling logic for deleting-------------
+
+  updateEnemy();
+  if (enemyList.size() <= 0)
+  {
+    setup();
+  }
+  
+}
+
+void updateBullets()
+{
+   //----------bullets 2 for loops are needed 1 for moving and displaying another 1 for handling logic for deleting-------------
 
   //updateBulletBounce();
 
@@ -72,11 +91,6 @@ void draw()
     }
     bullets.get(i).move();
     bullets.get(i).display();
-
-    //int enemyCenterX = enemy.x + enemy.size/2;
-    //int enemyCenterY = enemy.y + enemy.size/2;
-
-    //println(distFromEnemy);
 
     if (bullets.get(i).x > width || bullets.get(i).x < 0 || bullets.get(i).y > height || bullets.get(i).y < 0)
     {
@@ -109,24 +123,7 @@ void draw()
       }
     }
   }
-
-
-
-
-  //----------------------walls----------
-  w.display();
-
-
-
-  updateEnemy();
-  if (enemyList.size() <= 0)
-  {
-    setup();
-  }
-
-  
 }
-
 
 boolean colliding(Enemy enemy, Bullet b)
 {
@@ -175,7 +172,7 @@ PVector nearestPoint(Wall w, Bullet b)
   if (b.x >= (w.x + w.w))
   {
     return new PVector(w.x + w.w, b.y);
-  } else if (b.x  <= w.x)
+  } else if (b.x <= w.x)
   {
     return new PVector(w.x, b.y);
   } else if ((b.y + b.size/2) <= w.y)
@@ -186,19 +183,6 @@ PVector nearestPoint(Wall w, Bullet b)
   {
     println("Bottom");
     return new PVector(b.x, w.y + w.h);
-  }
-}
-
-void updateBulletBounce()
-{
-  for (Bullet b : bullets)
-  {
-    if (wallCollide(w, b, b.size/2))
-    {
-      PVector np = nearestPoint(w, b);
-      reflect(np, b);
-      break;
-    }
   }
 }
 
@@ -240,19 +224,32 @@ float [] calculateBulletDirection(int x1, int y1, int playerX, int playerY)
   //println(magnitude);
   directionVectorX /= magnitude;
   directionVectorY /= magnitude;
-  //println("dir x" + directionVectorX);
-  //println(directionVectorX + ", " + directionVectorY);
-  float[] a = {directionVectorX, directionVectorY};
-  return a;
+  float[] dir = {directionVectorX, directionVectorY};
+  return dir;
 }
 
-
-
-
+void fireBullet()
+{
+  if(shooting)
+  {
+    bulletDirectionVector = calculateBulletDirection(mouseX, mouseY, playerCenterX, playerCenterY);
+    bullets.add(new Bullet(playerCenterX, playerCenterY, bulletDirectionVector[0], bulletDirectionVector[1]));
+  }
+}
 void mousePressed()
 {
-  bulletDirectionVector = calculateBulletDirection(mouseX, mouseY, playerCenterX, playerCenterY);
-  bullets.add(new Bullet(playerCenterX, playerCenterY, bulletDirectionVector[0], bulletDirectionVector[1]));
+  if (mouseButton == LEFT) {
+    shooting = true;
+    
+  }
+}
+
+void mouseReleased()
+{
+  if(mouseButton == LEFT)
+  {
+    shooting = false;
+  }
 }
 void keyPressed()
 {
