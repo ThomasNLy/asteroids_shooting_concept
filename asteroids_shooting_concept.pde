@@ -1,9 +1,8 @@
 Player player;
 Enemy enemy;
-int playerCenterX;
+int playerCenterX; 
 int playerCenterY;
-int x;
-int y;
+
 ArrayList<Bullet> bullets;
 float bulletDirectionVector[];
 ArrayList<Enemy> enemyList;
@@ -13,6 +12,8 @@ int enemySpawn[][] = {{30, 30}, {500, 30}, {30, 500}, {500, 500}};
 Wall w;
 
 boolean shooting;
+int fireRate;
+int shootCoolDownTimer;
 
 //-------------controls-------
 final int W = 87;
@@ -42,6 +43,8 @@ void setup()
   w = new Wall(200, 100, 100, 100);
   
   shooting = false;
+  fireRate = 5;
+  shootCoolDownTimer = 0;
 }
 
 void draw()
@@ -230,8 +233,14 @@ float [] calculateBulletDirection(int x1, int y1, int playerX, int playerY)
 
 void fireBullet()
 {
-  if(shooting)
+  println(shootCoolDownTimer);
+  if(shootCoolDownTimer < fireRate)
   {
+    shootCoolDownTimer++;
+  }
+  if(shooting && shootCoolDownTimer == fireRate)
+  {
+    shootCoolDownTimer = 0;
     bulletDirectionVector = calculateBulletDirection(mouseX, mouseY, playerCenterX, playerCenterY);
     bullets.add(new Bullet(playerCenterX, playerCenterY, bulletDirectionVector[0], bulletDirectionVector[1]));
   }
